@@ -1,0 +1,18 @@
+import re
+
+text = "Hello Haritha! Contact me at 9876543210. Email: student@gmail.com"
+
+word = re.search("Haritha", text)
+print("Word Search:", word.group() if word else "Not found")
+
+pattern = re.match("Hello", text)
+print("Match at Beginning:", pattern.group() if pattern else "Not found")
+
+digits = re.findall(r"\d+", text)
+print("Digits Found:", digits)
+
+email = re.search(r"[\w.-]+@[\w.-]+\.\w+", text)
+print("Email Found:", email.group() if email else "Not found")
+
+new_text = re.sub("Hello", "Welcome", text)
+print("After Replacement:", new_text)
