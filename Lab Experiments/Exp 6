@@ -1,0 +1,37 @@
+import random
+from collections import defaultdict
+
+text = """
+I love machine learning.
+I love Python programming.
+Machine learning is interesting.
+Python programming is easy.
+I love learning new things.
+"""
+words = text.lower().replace(".", "").split()
+
+bigram_model = defaultdict(list)
+
+for i in range(len(words) - 1):
+    current_word = words[i]
+    next_word = words[i + 1]
+
+    bigram_model[current_word].append(next_word)
+
+def generate_text(start_word, length=15):
+    current_word = start_word.lower()
+    generated_words = [current_word]
+
+    for _ in range(length - 1):
+        if current_word not in bigram_model:
+            break
+
+        next_word = random.choice(bigram_model[current_word])
+        generated_words.append(next_word)
+
+        current_word = next_word
+
+    return " ".join(generated_words)
+
+print("Generated Text:")
+print(generate_text("i", 15))
