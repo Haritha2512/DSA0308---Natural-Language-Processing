@@ -1,0 +1,29 @@
+import nltk
+from nltk import RegexpTagger
+
+text = "The beautiful girl plays football quickly"
+
+words = nltk.word_tokenize(text)
+
+patterns = [
+    (r'^The$|^the$|^A$|^a$|^An$|^an$', 'DT'),
+    (r'^He$|^She$|^It$|^They$|^We$|^I$', 'PRP'),
+    (r'.*ing$', 'VBG'),
+    (r'.*ed$', 'VBD'),
+    (r'.*ly$', 'RB'),
+    (r'.*ous$|.*ful$|.*able$', 'JJ'),
+    (r'.*s$', 'NNS'),
+    (r'^[A-Z].*$', 'NNP'),
+    (r'.*', 'NN')
+]
+
+tagger = RegexpTagger(patterns)
+
+tagged_words = tagger.tag(words)
+
+print("Original Text:")
+print(text)
+
+print("\nPOS Tagged Output:")
+for word, tag in tagged_words:
+    print(word, ":", tag)
