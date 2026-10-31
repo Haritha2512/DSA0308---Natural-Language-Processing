@@ -1,0 +1,32 @@
+import nltk
+
+sentence = "The dog runs fast"
+
+words = nltk.word_tokenize(sentence)
+
+tagged_words = [
+    (word, "NN" if word.lower() == "runs" else "NN")
+    for word in words
+]
+
+print("Initial POS Tags:")
+print(tagged_words)
+
+def transformation_tagging(tagged_words):
+
+    corrected_tags = []
+
+    for i, (word, tag) in enumerate(tagged_words):
+
+        if word.lower() == "runs" and tag == "NN":
+            tag = "VBZ"
+
+        corrected_tags.append((word, tag))
+
+    return corrected_tags
+
+final_tags = transformation_tagging(tagged_words)
+
+print("\nFinal POS Tags:")
+for word, tag in final_tags:
+    print(word, "/", tag)
