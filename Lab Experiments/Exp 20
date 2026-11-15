@@ -1,0 +1,39 @@
+!pip install scikit-learn
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+documents = [
+    "Machine learning is a branch of artificial intelligence",
+    "Artificial intelligence is used in robotics",
+    "Python is a popular programming language",
+    "Deep learning is a part of machine learning",
+    "Natural language processing is used in AI"
+]
+
+print("Document Collection:")
+for i, doc in enumerate(documents):
+    print("Document", i + 1, ":", doc)
+
+vectorizer = TfidfVectorizer()
+
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+query = input("\nEnter search query: ")
+
+query_vector = vectorizer.transform([query])
+
+similarity = cosine_similarity(
+    query_vector, tfidf_matrix
+).flatten()
+
+ranked_indices = similarity.argsort()[::-1]
+
+print("\nRanked Documents:")
+
+for index in ranked_indices:
+
+    if similarity[index] > 0:
+        print("\nDocument:", index + 1)
+        print("Content:", documents[index])
+        print("Similarity Score:", round(similarity[index], 4))
