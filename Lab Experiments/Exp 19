@@ -1,0 +1,61 @@
+import nltk
+import re
+
+from nltk.corpus import wordnet as wn
+from nltk.corpus import stopwords
+
+nltk.download('wordnet')
+nltk.download('stopwords')
+
+def preprocess(text):
+
+    words = re.findall(r'\b[a-z]+\b', text.lower())
+
+    stop_words = set(stopwords.words('english'))
+
+    return set(word for word in words
+               if word not in stop_words)
+
+def lesk_algorithm(sentence, ambiguous_word):
+
+    context = preprocess(sentence)
+
+    synsets = wn.synsets(ambiguous_word)
+
+    best_sense = None
+    max_overlap = 0
+
+    for syn in synsets:
+
+        signature = syn.definition()
+
+        for example in syn.examples():
+            signature += " " + example
+
+        signature_words = preprocess(signature)
+
+        overlap = len(context.intersection(signature_words))
+
+        print("\nMeaning:", syn.definition())
+        print("Overlap:", overlap)
+
+        if overlap > max_overlap:
+            max_overlap = overlap
+            best_sense = syn
+
+    return best_sense
+
+sentence = input("Enter a sentence: ")
+word = input("Enter ambiguous word: ")
+
+result = lesk_algorithm(sentence, word)
+
+if result:
+
+    print("\nSelected Meaning:")
+    print(result.definition())
+
+    print("Synset:", result.name())
+
+else:
+    print("\nNo meaning found.")
