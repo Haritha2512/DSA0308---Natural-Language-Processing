@@ -1,0 +1,122 @@
+grammar = {
+    "S": [
+        (("NP", "VP"), 1.0)
+    ],
+
+    "NP": [
+        (("Det", "N"), 0.6),
+        (("Name",), 0.4)
+    ],
+
+    "VP": [
+        (("V", "NP"), 0.7),
+        (("V",), 0.3)
+    ],
+
+    "Det": [
+        (("the",), 0.5),
+        (("a",), 0.5)
+    ],
+
+    "N": [
+        (("boy",), 0.5),
+        (("apple",), 0.5)
+    ],
+
+    "V": [
+        (("eats",), 1.0)
+    ],
+
+    "Name": [
+        (("John",), 1.0)
+    ]
+}
+
+def pcfg_parser(sentence):
+
+    words = sentence.split()
+    n = len(words)
+
+    chart = {}
+
+    for i in range(n):
+        for lhs, rules in grammar.items():
+            for rhs, prob in rules:
+                if len(rhs) == 1 and rhs[0] == words[i]:
+                    chart[(i, i + 1, lhs)] = (
+                        prob, (lhs, words[i])
+                    )
+
+    for length in range(2, n + 1):
+        for start in range(n - length + 1):
+
+            end = start + length
+
+            for lhs, rules in grammar.items():
+
+                for rhs, rule_prob in rules:
+
+                    if len(rhs) != 2:
+                        continue
+
+                    B, C = rhs
+
+                    for split in range(start + 1, end):
+
+                        left = chart.get(
+                            (start, split, B)
+                        )
+
+                        right = chart.get(
+                            (split, end, C)
+                        )
+
+                        if left and right:
+
+                            probability = (
+                                rule_prob *
+                                left[0] *
+                                right[0]
+                            )
+
+                            key = (start, end, lhs)
+
+                            if (key not in chart or
+                                probability > chart[key][0]):
+
+                                tree = (
+                                    lhs,
+                                    left[1],
+                                    right[1]
+                                )
+
+                                chart[key] = (
+                                    probability, tree
+                                )
+
+    return chart.get((0, n, "S"))
+
+def display_tree(tree, level=0):
+
+    print("  " * level + str(tree[0]))
+
+    for child in tree[1:]:
+        if isinstance(child, tuple):
+            display_tree(child, level + 1)
+        else:
+            print("  " * (level + 1) + child)
+
+sentence = input("Enter a sentence: ")
+
+result = pcfg_parser(sentence)
+
+if result:
+    probability, tree = result
+
+    print("\nMost Probable Parse Tree:")
+    display_tree(tree)
+
+    print("\nParse Probability:", probability)
+
+else:
+    print("\nNo valid parse found.")
