@@ -1,0 +1,66 @@
+def earley_parser(grammar, start_symbol, input_string):
+
+    n = len(input_string)
+
+    chart = [set() for _ in range(n + 1)]
+
+    chart[0].add(("S'", ("S",), 0, 0))
+
+    for i in range(n + 1):
+
+        agenda = list(chart[i])
+
+        while agenda:
+
+            lhs, rhs, dot, start = agenda.pop()
+
+            if dot == len(rhs):
+
+                for plhs, prhs, pdot, pstart in list(chart[start]):
+
+                    if pdot < len(prhs) and prhs[pdot] == lhs:
+
+                        new_state = (
+                            plhs, prhs, pdot + 1, pstart
+                        )
+
+                        if new_state not in chart[i]:
+                            chart[i].add(new_state)
+                            agenda.append(new_state)
+
+            elif rhs[dot] in grammar:
+
+                for production in grammar[rhs[dot]]:
+
+                    new_state = (
+                        rhs[dot], tuple(production), 0, i
+                    )
+
+                    if new_state not in chart[i]:
+                        chart[i].add(new_state)
+                        agenda.append(new_state)
+
+            else:
+
+                if i < n and input_string[i] == rhs[dot]:
+
+                    new_state = (
+                        lhs, rhs, dot + 1, start
+                    )
+
+                    chart[i + 1].add(new_state)
+
+    final_state = ("S'", ("S",), 1, 0)
+
+    return final_state in chart[n]
+
+grammar = {
+    'S': [['a', 'S', 'b'], ['a', 'b']]
+}
+
+string = input("Enter the input string: ")
+
+if earley_parser(grammar, 'S', string):
+    print("String Accepted")
+else:
+    print("String Rejected")
