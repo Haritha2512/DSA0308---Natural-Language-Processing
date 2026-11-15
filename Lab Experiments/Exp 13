@@ -1,0 +1,59 @@
+grammar = {
+    'S': [['NP', 'VP']],
+    'NP': [['Det', 'N']],
+    'VP': [['V', 'NP']],
+    'Det': [['the'], ['a']],
+    'N': [['boy'], ['apple']],
+    'V': [['eats']]
+}
+
+def parse(symbol, words, position):
+
+    if symbol not in grammar:
+        if position < len(words) and words[position] == symbol:
+            return (symbol, []), position + 1
+        return None, position
+
+    for production in grammar[symbol]:
+
+        children = []
+        current_position = position
+
+        for item in production:
+            tree, current_position = parse(
+                item, words, current_position
+            )
+
+            if tree is None:
+                break
+
+            children.append(tree)
+
+        else:
+            return (symbol, children), current_position
+
+    return None, position
+
+def display_tree(tree, level=0):
+
+    symbol, children = tree
+
+    print("  " * level + symbol)
+
+    for child in children:
+        display_tree(child, level + 1)
+
+sentence = input("Enter a sentence: ")
+words = sentence.lower().split()
+
+tree, position = parse('S', words, 0)
+
+if tree is not None and position == len(words):
+
+    print("\nParse Tree:")
+    display_tree(tree)
+
+    print("\nSentence is Valid.")
+
+else:
+    print("\nSentence is Invalid.")
