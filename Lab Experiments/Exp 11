@@ -1,0 +1,40 @@
+grammar = {
+    'S': ['aSb', 'ab']
+}
+
+def parse(symbol, input_string, position):
+    if symbol not in grammar:
+        if position < len(input_string) and input_string[position] == symbol:
+            return [position + 1]
+        return []
+
+    results = []
+
+    for production in grammar[symbol]:
+        positions = [position]
+
+        for char in production:
+            new_positions = []
+
+            for pos in positions:
+                new_positions.extend(
+                    parse(char, input_string, pos)
+                )
+
+            positions = new_positions
+
+            if not positions:
+                break
+
+        results.extend(positions)
+
+    return results
+
+string = input("Enter the input string: ")
+
+result = parse('S', string, 0)
+
+if len(string) in result:
+    print("String Accepted")
+else:
+    print("String Rejected")
