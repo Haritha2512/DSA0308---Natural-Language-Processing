@@ -1,0 +1,87 @@
+
+import nltk
+from nltk import word_tokenize, pos_tag, sent_tokenize
+
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('averaged_perceptron_tagger_eng')
+
+text = """
+The student bought a laptop.
+She uses it for her studies.
+The laptop is very fast.
+She likes the laptop.
+"""
+
+sentences = sent_tokenize(text)
+
+noun_list = []
+pronouns = {
+    "he": "male",
+    "him": "male",
+    "his": "male",
+    "she": "female",
+    "her": "female",
+    "hers": "female",
+    "it": "neutral",
+    "they": "plural",
+    "them": "plural",
+    "their": "plural"
+}
+
+resolution = []
+
+for sentence in sentences:
+    words = word_tokenize(sentence)
+    tagged_words = pos_tag(words)
+
+    current_nouns = []
+
+    for word, tag in tagged_words:
+        if tag in ['NN', 'NNS', 'NNP', 'NNPS']:
+            current_nouns.append(word)
+
+    for word, tag in tagged_words:
+        lower_word = word.lower()
+
+        if lower_word in pronouns:
+            reference = None
+
+            if pronouns[lower_word] == "neutral":
+                for noun in reversed(noun_list):
+                    if noun.lower() in ['laptop', 'book', 'computer']:
+                        reference = noun
+                        break
+
+            elif pronouns[lower_word] == "female":
+                for noun in reversed(noun_list):
+                    if noun.lower() in ['student', 'woman', 'girl',
+                                        'teacher', 'mother']:
+                        reference = noun
+                        break
+
+            elif pronouns[lower_word] == "male":
+                for noun in reversed(noun_list):
+                    if noun.lower() in ['man', 'boy', 'father',
+                                        'teacher', 'student']:
+                        reference = noun
+                        break
+
+            else:
+                if noun_list:
+                    reference = noun_list[-1]
+
+            resolution.append((word, reference))
+
+    noun_list.extend(current_nouns)
+
+print("Input Text:")
+print(text)
+
+print("\nReference Resolution Results:")
+
+for pronoun, reference in resolution:
+    if reference:
+        print(pronoun, "refers to", reference)
+    else:
+        print(pronoun, "-> Reference not found")
