@@ -1,0 +1,49 @@
+import nltk
+from nltk import word_tokenize, pos_tag
+from nltk.chunk import RegexpParser
+
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('averaged_perceptron_tagger_eng')
+
+sentence = "The intelligent student reads a book in the university library."
+
+tokens = word_tokenize(sentence)
+
+tagged_words = pos_tag(tokens)
+
+print("POS Tagged Words:")
+print(tagged_words)
+
+grammar = r"""
+    NP: {<DT>?<JJ.*>*<NN.*>+}
+"""
+
+parser = RegexpParser(grammar)
+
+tree = parser.parse(tagged_words)
+
+print("\nExtracted Noun Phrases:")
+
+for subtree in tree.subtrees(filter=lambda t: t.label() == 'NP'):
+
+    phrase = " ".join(word for word, tag in subtree.leaves())
+
+    head_noun = subtree.leaves()[-1][0]
+
+    print("\nNoun Phrase:", phrase)
+    print("Head Noun:", head_noun)
+
+    meaning = {
+        "student": "A person who studies.",
+        "book": "A collection of written or printed information.",
+        "library": "A place where books and information are stored."
+    }
+
+    if head_noun.lower() in meaning:
+        print("Meaning:", meaning[head_noun.lower()])
+    else:
+        print("Meaning: A noun phrase referring to", head_noun)
+        
+print("\nSyntax Tree:")
+print(tree)
