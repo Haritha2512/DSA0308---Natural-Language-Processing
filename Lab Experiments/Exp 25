@@ -1,0 +1,23 @@
+
+from openai import OpenAI
+import getpass
+
+api_key = getpass.getpass("Enter your OpenAI API Key: ")
+
+client = OpenAI(api_key=api_key)
+
+print("TEXT GENERATION USING OPENAI GPT MODEL")
+
+prompt = input("\nEnter your prompt: ")
+
+try:
+    response = client.responses.create(
+        model="gpt-5.5",
+        input=prompt
+    )
+
+    print("\nGenerated Text:")
+    print(response.output_text)
+
+except Exception as e:
+    print("Error:", e)
